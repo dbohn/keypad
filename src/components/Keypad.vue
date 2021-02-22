@@ -8,13 +8,14 @@
 </template>
 <script>
 import Key from './Key.vue';
-import Keypad from "../keypad/Keypad";
+import ButtonConfiguration from "../keypad/ButtonConfiguration";
 
 export default {
-    data() {
-        return {
-            actions: new Keypad(),
-        }
+
+    props: {
+        actions: {
+            default: () => (new ButtonConfiguration()),
+        },
     },
 
     components: { Key },
@@ -26,7 +27,7 @@ export default {
         },
 
         configure(i) {
-            console.log("Configure button ", i);
+            this.$emit('configure', i);
         }
     },
 }
