@@ -7,6 +7,21 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 const path = require('path');
 import { run } from "./system/shell";
 
+/*import SerialPort from 'serialport';
+
+const port = new SerialPort('COM4', {
+  baudRate: 115200,
+});
+
+port.on('data', function (data) {
+  console.log('Data: ', data);
+});
+
+// Open errors will be emitted as an error event
+port.on('error', function (err) {
+  console.log('Error: ', err.message)
+})*/
+
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
