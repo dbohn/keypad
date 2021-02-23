@@ -37,13 +37,19 @@ export async function refreshTokens() {
 
             accessToken = response.data.token;
             profile = jwtDecode(accessToken);
+
+            await keytar.setPassword(keytarService, keytarAccount, accessToken);
+
+            return accessToken;
         } catch (error) {
-            console.log(error);
+            console.error(error);
             await logout();
 
             throw error;
         }
     }
+
+    throw new Error("Unauthenticated");
 }
 
 export async function loadTokens(callbackUrl) {
@@ -77,6 +83,8 @@ export async function loadTokens(callbackUrl) {
         profile = jwtDecode(accessToken);
 
         await keytar.setPassword(keytarService, keytarAccount, accessToken);
+
+        return accessToken;
     } catch (error) {
         console.log(error);
 
@@ -85,7 +93,7 @@ export async function loadTokens(callbackUrl) {
     }
 }
 
-async function logout() {
+export async function logout() {
     await keytar.deletePassword(keytarService, keytarAccount);
     accessToken = null;
     profile = null;

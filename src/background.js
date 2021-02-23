@@ -7,6 +7,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 const path = require('path');
 import { run } from "./system/shell";
 import {createAuthWindow} from './services/auth-browser';
+import {refreshTokens, logout} from './services/auth-service';
 
 /*import SerialPort from 'serialport';
 
@@ -102,6 +103,14 @@ ipcMain.handle("shell-action:invoke", (event, argument) => {
   return run(argument);
 });
 
+ipcMain.handle('authentication:refresh', () => {
+  return refreshTokens();
+});
+
 ipcMain.handle('authentication:start', () => {
   return createAuthWindow();
 })
+
+ipcMain.handle('authentication:logout', () => {
+  return logout();
+});

@@ -1,6 +1,6 @@
 import {BrowserWindow} from 'electron';
 import { redirectUri, callbackUri } from '../../env-variables.json';
-import {loadTokens, getAccessToken} from './auth-service';
+import {loadTokens} from './auth-service';
 
 let win = null;
 
@@ -29,11 +29,11 @@ export function createAuthWindow() {
 
         webRequest.onBeforeRequest(filter, async ({ url }) => {
             try {
-                await loadTokens(url);
+                resolve(await loadTokens(url));
             } catch (error) {
                 reject(error);
             }
-            resolve(getAccessToken());
+            //resolve(getAccessToken());
             return destroyAuthWin();
         });
 

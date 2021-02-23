@@ -1,6 +1,8 @@
 import ActionCollection from "../ActionCollection";
 import Color from "./Color";
 
+import Vue from 'vue';
+
 export class Button {
     constructor(type, color, params = {}) {
         this.type = type;
@@ -42,7 +44,7 @@ export default class ButtonConfiguration {
     }
 
     setConfig(button, config) {
-        this.config[button] = config;
+        Vue.set(this.config, button, config);
 
         return this;
     }
