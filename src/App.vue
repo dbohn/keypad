@@ -4,6 +4,7 @@
             <keypad :actions="actions" @configure="configureAction"></keypad>
         </div>
         <div class="bg-gray-200 w-1/3 p-3">
+            <button class="bg-gray-800 text-gray-100 px-3 py-2 rounded" @click.prevent="beginLoginProcess">Login to Bot</button>
             <action-configuration :button-id="configuredAction" v-model="configuredActionConfig" v-if="configuredAction !== null"></action-configuration>
         </div>
     </div>
@@ -12,14 +13,12 @@
 import ActionConfiguration from './components/ActionConfiguration.vue';
 import Keypad from './components/Keypad.vue';
 import ButtonConfiguration from './keypad/ButtonConfiguration';
-import Color from './keypad/Color';
 
 export default {
     name: 'App',
 
     data() {
         return {
-            testColor: new Color({r: 255}),
             actions: new ButtonConfiguration(),
             configuredAction: null,
         };
@@ -45,7 +44,15 @@ export default {
         configureAction(buttonId) {
             console.log("Configure", buttonId);
             this.configuredAction = buttonId;
-        }
+        },
+
+        beginLoginProcess() {
+            window.ipcRenderer.invoke("authentication:start").then((result) => {
+                console.log("Authenticated", result);
+            }).catch((error) => {
+                console.log(error);
+            });
+        },
     },
 
     components: {

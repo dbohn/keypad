@@ -6,6 +6,7 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 const path = require('path');
 import { run } from "./system/shell";
+import {createAuthWindow} from './services/auth-browser';
 
 /*import SerialPort from 'serialport';
 
@@ -99,4 +100,8 @@ if (isDevelopment) {
 
 ipcMain.handle("shell-action:invoke", (event, argument) => {
   return run(argument);
+});
+
+ipcMain.handle('authentication:start', () => {
+  return createAuthWindow();
 })
