@@ -1,6 +1,6 @@
 export default class LogAction {
     name() {
-        return "Log Action";
+        return "Daten in Log schreiben";
     }
 
     params() {

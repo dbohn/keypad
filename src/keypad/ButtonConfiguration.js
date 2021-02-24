@@ -17,6 +17,11 @@ export class Button {
     static fromButton(button) {
         return new Button(button.type, button.color, button.params);
     }
+
+    setType(type) {
+        this.type = type;
+        this.params = {};
+    }
 }
 
 export default class ButtonConfiguration {

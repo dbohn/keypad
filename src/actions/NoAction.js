@@ -1,6 +1,6 @@
 export default class NoAction {
     name() {
-        return "No Action";
+        return "Keine Aktion";
     }
 
     params() {

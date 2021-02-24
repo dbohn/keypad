@@ -9,20 +9,20 @@ import { run } from "./system/shell";
 import {createAuthWindow} from './services/auth-browser';
 import {refreshTokens, logout} from './services/auth-service';
 
-/*import SerialPort from 'serialport';
+import SerialPort from 'serialport';
 
 const port = new SerialPort('COM4', {
   baudRate: 115200,
 });
 
 port.on('data', function (data) {
-  console.log('Data: ', data);
+  console.log('Data: ', data.toString());
 });
 
 // Open errors will be emitted as an error event
 port.on('error', function (err) {
   console.log('Error: ', err.message)
-})*/
+})
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -42,6 +42,8 @@ async function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
+
+  win.setMenu(null);
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode

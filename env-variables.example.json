@@ -3,5 +3,7 @@
     "callbackUri": "",
     "tokenUri": "",
     "refreshUri": "",
-    "userinfoUri": ""
+    "userinfoUri": "",
+    "snippetsBaseUri": "",
+    "guildsUri": ""
 }

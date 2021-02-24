@@ -3,7 +3,7 @@ import axios from 'axios';
 import keytar from 'keytar';
 import os from 'os';
 import {refreshUri, tokenUri} from '../../env-variables.json';
-import { URL } from 'url';
+import { URL, URLSearchParams } from 'url';
 
 const keytarService = 'fidibumsikeypad';
 const keytarAccount = os.userInfo().username;
@@ -24,7 +24,7 @@ export async function refreshTokens() {
 
     if (refreshToken) {
         const refreshOptions = {
-            method: "GET",
+            method: "POST",
             url: refreshUri,
             headers: {
                 "content-type": "application/json",
@@ -63,17 +63,17 @@ export async function loadTokens(callbackUrl) {
         throw error;
     }
 
-    const queryData = {
+    const queryData = new URLSearchParams({
         authorizationCode: query.get('code'),
-    }
+    });
 
     const options = {
-        method: "GET",
+        method: "POST",
         url: tokenUri,
         headers: {
-            "content-type": "application/json",
+            "content-type": "application/x-www-form-urlencoded",
         },
-        params: queryData,
+        data: queryData,
     };
 
     try {

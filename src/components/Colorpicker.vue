@@ -1,7 +1,8 @@
 <template>
-  <div>
-      <input type="color" v-model="colorValue">
-  </div>
+  <label class="py-2 flex items-center">
+      <input class="mr-2" type="color" v-model="colorValue">
+      {{ colorValue }}
+  </label>
 </template>
 <script>
 import Color from '../keypad/Color';

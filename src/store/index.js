@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 import axios from 'axios';
 
-import {userinfoUri} from '../../env-variables.json'
+import { userinfoUri, snippetsBaseUri, guildsUri } from '../../env-variables.json'
 
 Vue.use(Vuex)
 
@@ -14,6 +14,17 @@ export default new Vuex.Store({
             state: 'unauthenticated',
             userInfo: null,
         },
+
+        snippets: {
+            snippets: [],
+            newSnippet: {
+                file: null,
+            }
+        },
+
+        guilds: {
+            guilds: [],
+        }
     },
     mutations: {
         setAccessToken(state, { accessToken }) {
@@ -26,6 +37,18 @@ export default new Vuex.Store({
 
         setUserInfo(state, {userInfo}) {
             state.auth.userInfo = userInfo;
+        },
+
+        loadSnippets(state, {snippets}) {
+            Vue.set(state.snippets, 'snippets', snippets);
+        },
+
+        selectSnippetFile(state, {file}) {
+            state.snippets.newSnippet.file = file;
+        },
+
+        loadGuilds(state, {guilds}) {
+            Vue.set(state.guilds, 'guilds', guilds);
         }
     },
     actions: {
@@ -73,7 +96,68 @@ export default new Vuex.Store({
                     userInfo: response.data,
                 })
             });
-        }
+        },
+
+        loadSnippets({state, commit}) {
+            return axios({
+                method: 'GET',
+                url: snippetsBaseUri,
+                headers: {
+                    "Authorization": "Bearer " + state.auth.accessToken,
+                }
+            }).then((response) => {
+                commit('loadSnippets', {
+                    snippets: response.data,
+                });
+            })
+        },
+
+        playSnippet({state}, {snippetId, guildId}) {
+            return axios({
+                method: 'POST',
+                url: `${snippetsBaseUri}/${snippetId}/play`,
+                headers: {
+                    "Authorization": "Bearer " + state.auth.accessToken,
+                },
+                data: new URLSearchParams({ guildId }),
+            })
+        },
+
+        createSnippet({ state, commit }) {
+            if (state.snippets.newSnippet.file === null) {
+                return Promise.reject();
+            }
+
+            let formData = new FormData();
+            formData.append('snippet', state.snippets.newSnippet.file);
+
+            return axios({
+                method: 'POST',
+                url: snippetsBaseUri,
+                headers: {
+                    "Authorization": "Bearer " + state.auth.accessToken,
+                    'content-type': 'multipart/form-data'
+                },
+                data: formData,
+            }).then((response) => {
+                commit('selectSnippetFile', {file: null});
+                return response;
+            });
+        },
+
+        loadGuilds({ commit, state }) {
+            return axios({
+                method: 'GET',
+                url: guildsUri,
+                headers: {
+                    "Authorization": "Bearer " + state.auth.accessToken,
+                }
+            }).then((response) => {
+                commit('loadGuilds', {
+                    guilds: response.data,
+                });
+            })
+        },
     },
     modules: {
     }
