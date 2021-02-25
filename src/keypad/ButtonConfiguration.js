@@ -25,19 +25,22 @@ export class Button {
 }
 
 export default class ButtonConfiguration {
-    constructor() {
+    constructor(store) {
         this.config = {
             1: new Button("LogAction", new Color({r: 255}), {message: "Hello World"}),
             2: new Button("NoAction", new Color({g: 255})),
-            3: new Button("ShellAction", new Color({ b: 255 }), {command: ['whoami']})
+            3: new Button("ShellAction", new Color({ b: 255 }), {command: ['whoami']}),
+            4: new Button("SnippetAction", new Color({r: 255}))
         }
+
+        this.store = store;
     }
 
     trigger(button) {
         const buttonConfig = this.getConfig(button);
         const action = new (this.resolveAction(buttonConfig.type));
 
-        return action.handle(buttonConfig.params);
+        return action.handle(buttonConfig.params, this.store);
     }
 
     resolveAction(type) {

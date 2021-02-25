@@ -30,8 +30,9 @@ export default {
 
     data() {
         return {
-            actions: new ButtonConfiguration(),
+            actions: new ButtonConfiguration(this.$store),
             configuredAction: null,
+            port: null,
         };
     },
 
@@ -57,6 +58,19 @@ export default {
 
     mounted() {
         this.$store.dispatch('checkAvailableAccessToken').catch(() => {});
+
+        const { port1, port2 } = new MessageChannel();
+        window.ipcRenderer.postMessage('serial:open', { port: 'COM4' }, [port1]);
+
+        this.port = port2;
+
+        this.port.onmessage = (evt) => {
+            console.log(evt.data);
+            if (evt.data.event === 'receive' && evt.data.message === "u3") {
+                console.log(evt.data);
+                this.actions.trigger(4);
+            }
+        }
     },
 
     methods: {

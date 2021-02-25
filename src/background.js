@@ -8,21 +8,7 @@ const path = require('path');
 import { run } from "./system/shell";
 import {createAuthWindow} from './services/auth-browser';
 import {refreshTokens, logout} from './services/auth-service';
-
-import SerialPort from 'serialport';
-
-const port = new SerialPort('COM4', {
-  baudRate: 115200,
-});
-
-port.on('data', function (data) {
-  console.log('Data: ', data.toString());
-});
-
-// Open errors will be emitted as an error event
-port.on('error', function (err) {
-  console.log('Error: ', err.message)
-})
+import SerialCommunication from './services/serial-communication';
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -115,4 +101,11 @@ ipcMain.handle('authentication:start', () => {
 
 ipcMain.handle('authentication:logout', () => {
   return logout();
+});
+
+const serCom = new SerialCommunication();
+
+ipcMain.on('serial:open', (e, {port: channelPort}) => {
+  const [port] = e.ports;
+  serCom.sendTo(port).connect(channelPort);
 });
