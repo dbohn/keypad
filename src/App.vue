@@ -1,6 +1,9 @@
 <template>
     <div id="app" class="antialiased font-sans flex flex-col min-h-screen max-h-screen overflow-hidden">
         <div class="flex-shrink-0 flex bg-gray-300 h-10 items-center px-2">
+            <div>
+                <serial-port-list @connect="connect" v-if="!connected"></serial-port-list>
+            </div>
             <button class="text-blue-500 px-3 py-2 text-sm ml-auto flex items-center" @click.prevent="beginLoginProcess" v-if="authState === 'unauthenticated'">
                 <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -22,6 +25,7 @@
 <script>
 import ActionConfiguration from './components/ActionConfiguration.vue';
 import Keypad from './components/Keypad.vue';
+import SerialPortList from './components/SerialPortList.vue';
 import UserInfo from './components/UserInfo.vue';
 import ButtonConfiguration from './keypad/ButtonConfiguration';
 
@@ -48,7 +52,12 @@ export default {
                 }
 
                 this.actions.setConfig(this.configuredAction, config);
+                this.port.postMessage({event: 'color', message: config.serialColorCommand(this.configuredAction - 1)});
             }
+        },
+
+        connected() {
+            return this.$store.state.serial.connected;
         },
 
         authState() {
@@ -58,22 +67,30 @@ export default {
 
     mounted() {
         this.$store.dispatch('checkAvailableAccessToken').catch(() => {});
-
-        const { port1, port2 } = new MessageChannel();
-        window.ipcRenderer.postMessage('serial:open', { port: 'COM4' }, [port1]);
-
-        this.port = port2;
-
-        this.port.onmessage = (evt) => {
-            console.log(evt.data);
-            if (evt.data.event === 'receive' && evt.data.message === "u3") {
-                console.log(evt.data);
-                this.actions.trigger(4);
-            }
-        }
     },
 
     methods: {
+        connect(port) {
+            const { port1, port2 } = new MessageChannel();
+            window.ipcRenderer.postMessage('serial:open', { port }, [port1]);
+
+            this.port = port2;
+
+            this.port.onmessage = (evt) => {
+                console.log(evt.data);
+                if (evt.data.event === 'receive' && evt.data.message === "u3") {
+                    this.actions.trigger(4);
+                }
+
+                if (evt.data.event === 'open') {
+                    this.$store.commit('connectSerialPort', {connected: true});
+                }
+
+                if (evt.data.event === 'close') {
+                    this.$store.commit('connectSerialPort', {connected: false});
+                }
+            }
+        },
         configureAction(buttonId) {
             this.configuredAction = buttonId;
         },
@@ -86,7 +103,8 @@ export default {
     components: {
         Keypad,
         ActionConfiguration,
-        UserInfo
+        UserInfo,
+        SerialPortList
     },
 }
 </script>

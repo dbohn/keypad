@@ -105,6 +105,10 @@ ipcMain.handle('authentication:logout', () => {
 
 const serCom = new SerialCommunication();
 
+ipcMain.handle('serial:list', () => {
+  return SerialCommunication.listPorts();
+});
+
 ipcMain.on('serial:open', (e, {port: channelPort}) => {
   const [port] = e.ports;
   serCom.sendTo(port).connect(channelPort);

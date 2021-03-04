@@ -45,7 +45,7 @@ held = [0] * 16
 readLineBuffer = ""
 
 # Read button press
-def readButton(delay):
+def readButton():
 	pressed = read_button_states(0, 16)
 	for i in range(16):
 		if pressed[i]:
@@ -92,6 +92,5 @@ while True:
 	receivedString = readline()
 	if (receivedString and len(receivedString.strip()) > 0):
 		parseCommand(receivedString.strip())
-	updateLeds()
-	readButton(0.3)
+	readButton()
 	time.sleep(0.001)

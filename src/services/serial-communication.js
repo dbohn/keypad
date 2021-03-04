@@ -10,6 +10,9 @@ export default class SerialCommunication {
     }
 
     connect(port, baudRate = 115200) {
+        if (this.port) {
+            this.disconnect();
+        }
         this.port = new SerialPort(port, {
             baudRate,
         });
@@ -23,6 +26,13 @@ export default class SerialCommunication {
             })
         });
 
+        this.port.on('open', (event) => {
+            this._answer({
+                event: 'open',
+                message: event,
+            });
+        })
+
         // Open errors will be emitted as an error event
         this.port.on('error', (err) => {
             this._answer({
@@ -31,6 +41,15 @@ export default class SerialCommunication {
             });
             this.disconnect();
         });
+
+        this.port.on('close', (err) => {
+            this._answer({
+                event: 'close',
+                disconnected: err !== null ? err.disconnected : true,
+            });
+
+            this.disconnect();
+        })
     }
 
     disconnect() {
@@ -45,8 +64,15 @@ export default class SerialCommunication {
      * @param {MessagePort} channelPort
      */
     sendTo(channelPort) {
-        console.log("Received message port");
         this.channelPort = channelPort;
+
+        this.channelPort.on('message', ({data: {event, message}}) => {
+            if (event === 'color') {
+                this.port.write(message);
+            }
+        });
+
+        this.channelPort.start();
 
         return this;
     }
@@ -55,5 +81,9 @@ export default class SerialCommunication {
         if (this.channelPort) {
             this.channelPort.postMessage(event);
         }
+    }
+
+    static async listPorts() {
+        return SerialPort.list();
     }
 }

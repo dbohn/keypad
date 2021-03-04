@@ -24,6 +24,11 @@ export default new Vuex.Store({
 
         guilds: {
             guilds: [],
+        },
+
+        serial: {
+            connected: false,
+            ports: [],
         }
     },
     mutations: {
@@ -49,6 +54,14 @@ export default new Vuex.Store({
 
         loadGuilds(state, {guilds}) {
             Vue.set(state.guilds, 'guilds', guilds);
+        },
+
+        loadSerialPorts(state, {ports}) {
+            Vue.set(state.serial, 'ports', ports);
+        },
+
+        connectSerialPort(state, {connected}) {
+            state.serial.connected = connected;
         }
     },
     actions: {
@@ -158,6 +171,14 @@ export default new Vuex.Store({
                 });
             })
         },
+
+        listSerialPorts({commit}) {
+            return window.ipcRenderer.invoke('serial:list').then((ports) => {
+                commit('loadSerialPorts', {ports});
+
+                return ports;
+            });
+        }
     },
     modules: {
     }

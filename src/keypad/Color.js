@@ -13,4 +13,8 @@ export default class Color {
     toHex() {
         return `#${Object.keys(this).map((k) => this[k].toString(16).padStart(2, "0")).join("")}`;
     }
+
+    toSerial() {
+        return `${this.r},${this.g},${this.b}`;
+    }
 }

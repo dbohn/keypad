@@ -22,6 +22,10 @@ export class Button {
         this.type = type;
         this.params = {};
     }
+
+    serialColorCommand(id) {
+        return `c${id},${this.color.toSerial()}\n`;
+    }
 }
 
 export default class ButtonConfiguration {
