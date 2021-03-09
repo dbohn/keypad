@@ -6,7 +6,7 @@ export default class LogAction {
     params() {
         return [
             {
-                label: "Message",
+                label: "Nachricht",
                 type: "string",
                 name: "message",
             }

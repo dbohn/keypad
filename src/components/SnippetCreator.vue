@@ -2,7 +2,7 @@
   <div>
       <input type="file" @change="selectFile" accept="audio/*" class="hidden" ref="fileInput">
       <div class="flex items-center">
-        <button class="bg-gray-700 text-gray-100 px-3 py-2 rounded shadow mr-2" @click="openFilePicker">Select</button>
+        <button class="bg-gray-700 text-gray-100 px-3 py-2 rounded shadow mr-2" @click="openFilePicker">+</button>
         <audio-preview :file="file" v-if="file !== null"></audio-preview>
         <button class="bg-gray-700 text-gray-100 px-3 py-2 rounded shadow mr-2" v-if="file !== null" @click="createSnippet">Create</button>
       </div>

@@ -18,14 +18,8 @@
                 </div>
             </div>
         </div>
-        <div class="my-2 border-b border-gray-400">
-            <label class="font-semibold mb-2 block" for="guild-selection">Gilde</label>
-            <guild-selector class="mb-2" v-model="guild"></guild-selector>
-        </div>
-        <div>
-            <p class="font-semibold mb-2">Snippet</p>
-            <snippet-selector :guild="guild"></snippet-selector>
-            <snippet-creator></snippet-creator>
+        <div v-for="param in currentAction.params()" :key="`param_${param.name}`">
+            <component class="py-2 my-2 border-b border-gray-400" :is="typeToComponentMap[param.type]" :config="param" :value="value.params[param.name]" @input="updateParam(param, $event)"></component>
         </div>
     </div>
 </template>
@@ -36,8 +30,8 @@ import Colorpicker from './Colorpicker.vue';
 
 import ActionCollection from "../ActionCollection";
 import SnippetSelector from './SnippetSelector.vue';
-import SnippetCreator from './SnippetCreator.vue';
 import GuildSelector from './GuildSelector.vue';
+import StringInput from './StringInput.vue';
 
 export default {
     name: "ActionConfiguration",
@@ -46,14 +40,19 @@ export default {
         return {
             actionCollection: ActionCollection,
             guild: null,
+            typeToComponentMap: {
+                snippet: SnippetSelector,
+                guild: GuildSelector,
+                string: StringInput,
+            },
         };
     },
 
     components: {
         Colorpicker,
         SnippetSelector,
-        SnippetCreator,
-        GuildSelector
+        GuildSelector,
+        StringInput,
     },
 
     computed: {
@@ -63,9 +62,7 @@ export default {
             },
 
             set(color) {
-                const button = Button.fromButton(this.value);
-                button.color = color;
-                this.$emit('input', button);
+                this.updateButton((button) => button.color = color);
             }
         },
 
@@ -75,16 +72,29 @@ export default {
             },
 
             set(type) {
-                const button = Button.fromButton(this.value);
-                button.setType(type);
-                this.$emit('input', button);
+                this.updateButton((button) => button.setType(type));
             }
         },
+
+        currentAction() {
+            const action = this.actionCollection[this.actionType];
+            return new action();
+        }
     },
 
     methods: {
         actionLabel(action) {
             return (new action()).name();
+        },
+
+        updateButton(callback) {
+            const button = Button.fromButton(this.value);
+            callback(button);
+            this.$emit('input', button);
+        },
+
+        updateParam(param, value) {
+            this.updateButton((button) => button.params[param.name] = value);
         }
     },
 

@@ -4,10 +4,21 @@ export default class NoAction {
     }
 
     params() {
-        return [];
+        return [
+            {
+                name: "snippet",
+                label: "Snippet",
+                type: "snippet",
+            },
+            {
+                name: "guild",
+                label: "Gilde",
+                type: "guild"
+            }
+        ];
     }
 
     handle(params, store) {
-        store.dispatch('playSnippet', { snippetId: "5", guildId: "320306499375333387" })
+        store.dispatch('playSnippet', { snippetId: params.snippet, guildId: params.guild });
     }
 }
