@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import axios from 'axios';
 
 import { userinfoUri, snippetsBaseUri, guildsUri } from '../../env-variables.json'
+import SerialFrontend from '../services/serial-frontend';
 
 Vue.use(Vuex)
 
@@ -29,6 +30,7 @@ export default new Vuex.Store({
         serial: {
             connected: false,
             ports: [],
+            frontend: new SerialFrontend(),
         }
     },
     mutations: {

@@ -8,6 +8,8 @@ export class Button {
         this.type = type;
         this.color = color;
         this.params = params;
+
+        this.pressed = false;
     }
 
     static default() {
@@ -29,22 +31,22 @@ export class Button {
 }
 
 export default class ButtonConfiguration {
-    constructor(store) {
+    constructor() {
         this.config = {
             1: new Button("LogAction", new Color({r: 255}), {message: "Hello World"}),
             2: new Button("NoAction", new Color({g: 255})),
             3: new Button("ShellAction", new Color({ b: 255 }), {command: ['whoami']}),
             4: new Button("SnippetAction", new Color({r: 255}))
         }
-
-        this.store = store;
     }
 
-    trigger(button) {
+    trigger(button, store = null) {
         const buttonConfig = this.getConfig(button);
+        buttonConfig.pressed = false;
+        this.setConfig(button, buttonConfig);
         const action = new (this.resolveAction(buttonConfig.type));
 
-        return action.handle(buttonConfig.params, this.store);
+        return action.handle(buttonConfig.params, store);
     }
 
     resolveAction(type) {
@@ -59,5 +61,15 @@ export default class ButtonConfiguration {
         Vue.set(this.config, button, config);
 
         return this;
+    }
+
+    setButtonPressed(button, state = true) {
+        const buttonConfig = this.getConfig(button);
+        buttonConfig.pressed = state;
+        this.setConfig(button, buttonConfig);
+    }
+
+    setButtonReleased(button) {
+        this.setButtonPressed(button, false);
     }
 }

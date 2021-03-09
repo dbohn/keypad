@@ -18,12 +18,29 @@ export default {
         },
     },
 
+    computed: {
+        serialFrontend() {
+            return this.$store.state.serial.frontend;
+        }
+    },
+
+    mounted() {
+        this.serialFrontend.on('receive', (event) => {
+            if (event.isUp()) {
+                this.triggerAction(event.buttonNumber);
+                this.actions.setButtonReleased(event.buttonNumber);
+            } else {
+                this.actions.setButtonPressed(event.buttonNumber);
+            }
+        });
+    },
+
     components: { Key },
     name: "Keypad",
 
     methods: {
         triggerAction(i) {
-            this.actions.trigger(i);
+            this.actions.trigger(i, this.$store);
         },
 
         configure(i) {

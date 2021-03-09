@@ -4,6 +4,7 @@ import Readline from '@serialport/parser-readline';
 export default class SerialCommunication {
     constructor(port = null, baudRate = 115200) {
         this.channelPort = null;
+        this.portName = null;
         if (port) {
             this.connect(port, baudRate)
         }
@@ -13,6 +14,7 @@ export default class SerialCommunication {
         if (this.port) {
             this.disconnect();
         }
+        this.portName = port;
         this.port = new SerialPort(port, {
             baudRate,
         });
@@ -26,10 +28,10 @@ export default class SerialCommunication {
             })
         });
 
-        this.port.on('open', (event) => {
+        this.port.on('open', () => {
             this._answer({
                 event: 'open',
-                message: event,
+                message: this.portName,
             });
         })
 
@@ -45,7 +47,10 @@ export default class SerialCommunication {
         this.port.on('close', (err) => {
             this._answer({
                 event: 'close',
-                disconnected: err !== null ? err.disconnected : true,
+                message: {
+                    disconnected: err !== null ? err.disconnected : true,
+                    port: this.portName,
+                }
             });
 
             this.disconnect();
@@ -53,7 +58,7 @@ export default class SerialCommunication {
     }
 
     disconnect() {
-        if (this.port.isOpen) {
+        if (this.port && this.port.isOpen) {
             this.port.close();
         }
         this.port = null;

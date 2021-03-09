@@ -18,6 +18,9 @@
             </div>
             <div class="bg-gray-200 overflow-auto w-1/3 p-3">
                 <action-configuration :button-id="configuredAction" v-model="configuredActionConfig" v-if="configuredAction !== null"></action-configuration>
+                <div class="h-full flex items-center" v-else>
+                    <p class="text-xl text-gray-800 leading-normal text-center">Um einen Button zu konfigurieren, wählen Sie den Button mit einem Rechtsklick!</p>
+                </div>
             </div>
         </div>
     </div>
@@ -34,9 +37,8 @@ export default {
 
     data() {
         return {
-            actions: new ButtonConfiguration(this.$store),
+            actions: new ButtonConfiguration(),
             configuredAction: null,
-            port: null,
         };
     },
 
@@ -52,7 +54,7 @@ export default {
                 }
 
                 this.actions.setConfig(this.configuredAction, config);
-                this.port.postMessage({event: 'color', message: config.serialColorCommand(this.configuredAction - 1)});
+                this.serialFrontend.emit('color', config.serialColorCommand(this.configuredAction - 1));
             }
         },
 
@@ -62,35 +64,60 @@ export default {
 
         authState() {
             return this.$store.state.auth.state;
+        },
+
+        serialFrontend() {
+            return this.$store.state.serial.frontend;
+        },
+
+        port() {
+            return this.serialFrontend.port;
+        },
+
+        remotePort() {
+            return this.serialFrontend.remotePort;
         }
     },
 
     mounted() {
         this.$store.dispatch('checkAvailableAccessToken').catch(() => {});
+
+        this.serialFrontend.on('open', () => {
+            this.$store.commit('connectSerialPort', {connected: true});
+        });
+
+        this.serialFrontend.on('close', () => {
+            this.$store.commit('connectSerialPort', {connected: false});
+        })
+    },
+
+    watch: {
+        port: {
+            immediate: true,
+            handler() {
+                /*this.port.onmessage = (evt) => {
+                    console.log(evt.data);
+                    if (evt.data.event === 'receive' && evt.data.message === "u3") {
+                        this.actions.trigger(4);
+                    }
+
+                    if (evt.data.event === 'open') {
+                        this.$store.commit('connectSerialPort', {connected: true});
+                    }
+
+                    if (evt.data.event === 'close') {
+                        this.$store.commit('connectSerialPort', {connected: false});
+                    }
+                }*/
+            }
+        }
     },
 
     methods: {
         connect(port) {
-            const { port1, port2 } = new MessageChannel();
-            window.ipcRenderer.postMessage('serial:open', { port }, [port1]);
-
-            this.port = port2;
-
-            this.port.onmessage = (evt) => {
-                console.log(evt.data);
-                if (evt.data.event === 'receive' && evt.data.message === "u3") {
-                    this.actions.trigger(4);
-                }
-
-                if (evt.data.event === 'open') {
-                    this.$store.commit('connectSerialPort', {connected: true});
-                }
-
-                if (evt.data.event === 'close') {
-                    this.$store.commit('connectSerialPort', {connected: false});
-                }
-            }
+            this.serialFrontend.openConnection(window.ipcRenderer, port);
         },
+
         configureAction(buttonId) {
             this.configuredAction = buttonId;
         },
