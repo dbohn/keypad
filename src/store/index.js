@@ -5,6 +5,9 @@ import axios from 'axios';
 
 import { userinfoUri, snippetsBaseUri, guildsUri } from '../../env-variables.json'
 import SerialFrontend from '../services/serial-frontend';
+import ButtonConfiguration from '../keypad/ButtonConfiguration';
+
+import createElectronStorePlugin from './electron-store-plugin';
 
 Vue.use(Vuex)
 
@@ -14,6 +17,10 @@ export default new Vuex.Store({
             accessToken: null,
             state: 'unauthenticated',
             userInfo: null,
+        },
+
+        keypad: {
+            actions: new ButtonConfiguration(),
         },
 
         snippets: {
@@ -66,6 +73,14 @@ export default new Vuex.Store({
         connectSerialPort(state, {connected, port = null}) {
             state.serial.connected = connected;
             state.serial.currentPort = port;
+        },
+
+        setKeypadAction(state, {action, config}) {
+            state.keypad.actions.setConfig(action, config);
+        },
+
+        setKeypadActions(state, { actions }) {
+            Vue.set(state.keypad, 'actions', actions);
         }
     },
     actions: {
@@ -185,5 +200,6 @@ export default new Vuex.Store({
         }
     },
     modules: {
-    }
+    },
+    plugins: [createElectronStorePlugin()],
 })

@@ -10,6 +10,10 @@ import {createAuthWindow} from './services/auth-browser';
 import {refreshTokens, logout} from './services/auth-service';
 import SerialCommunication from './services/serial-communication';
 
+import Store from 'electron-store';
+
+Store.initRenderer();
+
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }

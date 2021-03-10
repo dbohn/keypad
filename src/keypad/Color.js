@@ -22,6 +22,14 @@ export default class Color {
         return `${this.r},${this.g},${this.b}`;
     }
 
+    toJSON() {
+        return {
+            r: this.r,
+            g: this.g,
+            b: this.b
+        };
+    }
+
     /**
      *
      * @param {Color} color

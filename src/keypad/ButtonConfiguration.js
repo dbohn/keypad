@@ -20,6 +20,10 @@ export class Button {
         return new Button(button.type, button.color, button.params);
     }
 
+    static fromStore(storedConfig) {
+        return new Button(storedConfig.type, new Color(storedConfig.color), storedConfig.params);
+    }
+
     setType(type) {
         this.type = type;
         this.params = {};
@@ -28,16 +32,32 @@ export class Button {
     serialColorCommand(id) {
         return `c${id},${this.color.toSerial()}\n`;
     }
+
+    toJSON() {
+        return {
+            type: this.type,
+            color: this.color,
+            params: this.params,
+        };
+    }
 }
 
 export default class ButtonConfiguration {
-    constructor() {
-        this.config = {
+    constructor(config = null) {
+        this.config = config || {
             1: new Button("LogAction", new Color({r: 255}), {message: "Hello World"}),
             2: new Button("NoAction", new Color({g: 255})),
             3: new Button("ShellAction", new Color({ b: 255 }), {command: ['whoami']}),
             4: new Button("SnippetAction", new Color({ r: 255 }), { snippet: "5", guild: "320306499375333387" })
         }
+    }
+
+    static fromStorage(config) {
+        for (let key in config) {
+            config[key] = Button.fromStore(config[key]);
+        }
+
+        return new ButtonConfiguration(config);
     }
 
     trigger(button, store = null) {
@@ -87,5 +107,9 @@ export default class ButtonConfiguration {
     colorChanged(button, config) {
         const currentConfig = this.getConfig(button);
         return !currentConfig.color.equals(config.color);
+    }
+
+    toJSON() {
+        return this.config;
     }
 }

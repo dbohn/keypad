@@ -40,12 +40,15 @@ export default {
 
     data() {
         return {
-            actions: new ButtonConfiguration(),
             configuredAction: null,
         };
     },
 
     computed: {
+        actions() {
+            return this.$store.state.keypad.actions;
+        },
+
         configuredActionConfig: {
             get() {
                 return this.actions.getConfig(this.configuredAction);
@@ -60,7 +63,7 @@ export default {
                     this.serialFrontend.emit('color', config.serialColorCommand(this.configuredAction - 1));
                 }
 
-                this.actions.setConfig(this.configuredAction, config);
+                this.$store.commit('setKeypadAction', {action: this.configuredAction, config});
             }
         },
 
@@ -92,7 +95,9 @@ export default {
 
         this.serialFrontend.on('close', () => {
             this.$store.commit('connectSerialPort', {connected: false});
-        })
+        });
+
+        console.log(ButtonConfiguration.fromStorage(JSON.parse(JSON.stringify(this.actions))));
     },
 
     methods: {
