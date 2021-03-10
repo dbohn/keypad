@@ -48,7 +48,6 @@ export default class ButtonConfiguration {
             1: new Button("LogAction", new Color({r: 255}), {message: "Hello World"}),
             2: new Button("NoAction", new Color({g: 255})),
             3: new Button("ShellAction", new Color({ b: 255 }), {command: ['whoami']}),
-            4: new Button("SnippetAction", new Color({ r: 255 }), { snippet: "5", guild: "320306499375333387" })
         }
     }
 
