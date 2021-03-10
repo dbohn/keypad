@@ -2,22 +2,27 @@
   <div>
       <input type="file" @change="selectFile" accept="audio/*" class="hidden" ref="fileInput">
       <div class="flex items-center">
-        <button class="bg-gray-700 text-gray-100 px-3 py-2 rounded shadow mr-2" @click="openFilePicker">
-            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button class="text-gray-100 p-3 rounded shadow mr-2" :class="{'bg-gray-400': uploading, 'bg-gray-700': !uploading}" @click="openFilePicker" :disabled="uploading">
+            <spinner class="w-4 h-4" v-if="uploading"></spinner>
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" v-else>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
         </button>
-        <audio-preview :file="file" v-if="file !== null"></audio-preview>
-        <button class="bg-gray-700 text-gray-100 px-3 py-2 rounded shadow mr-2" v-if="file !== null" @click="createSnippet">Create</button>
       </div>
   </div>
 </template>
 
 <script>
-import AudioPreview from './AudioPreview.vue';
+import Spinner from './Spinner.vue';
 export default {
-  components: { AudioPreview },
+    components: { Spinner },
     name: "SnippetCreator",
+
+    data() {
+        return {
+            uploading: false,
+        }
+    },
 
     computed: {
         file: {
@@ -43,6 +48,8 @@ export default {
             }
 
             this.file = e.target.files[0];
+
+            this.$nextTick(() => this.createSnippet());
         },
 
         openFilePicker() {
@@ -50,10 +57,11 @@ export default {
         },
 
         createSnippet() {
+            this.uploading = true;
             this.$store.dispatch('createSnippet').then((response) => {
                 this.$store.dispatch('loadSnippets');
                 this.$emit('input', response.data);
-            });
+            }).finally(() => this.uploading = false);
         }
     },
 }
