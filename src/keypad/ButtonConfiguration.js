@@ -53,6 +53,17 @@ export default class ButtonConfiguration {
         return ActionCollection[type] || ActionCollection["NoAction"];
     }
 
+    serialColors() {
+        return Object.keys(this.config).map((button) => {
+            return this.config[button].serialColorCommand(button - 1);
+        });
+    }
+
+    /**
+     *
+     * @param {int} button
+     * @returns {Button}
+     */
     getConfig(button) {
         return this.config[button] || Button.default();
     }
@@ -71,5 +82,10 @@ export default class ButtonConfiguration {
 
     setButtonReleased(button) {
         this.setButtonPressed(button, false);
+    }
+
+    colorChanged(button, config) {
+        const currentConfig = this.getConfig(button);
+        return !currentConfig.color.equals(config.color);
     }
 }

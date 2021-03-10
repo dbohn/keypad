@@ -5,6 +5,10 @@ export default class Color {
         this.b = b;
     }
 
+    /**
+     *
+     * @param {string} hexString
+     */
     static fromHex(hexString) {
         const [r, g, b] = hexString.replace("#", "").match(/[a-fA-F0-9]{2}/g);
         return new Color({r: parseInt(r, 16), g: parseInt(g, 16), b: parseInt(b, 16)});
@@ -16,5 +20,13 @@ export default class Color {
 
     toSerial() {
         return `${this.r},${this.g},${this.b}`;
+    }
+
+    /**
+     *
+     * @param {Color} color
+     */
+    equals(color) {
+        return this.toSerial() === color.toSerial();
     }
 }

@@ -3,6 +3,7 @@ import board
 import busio
 import supervisor
 import sys
+import usb_cdc
 
 from adafruit_bus_device.i2c_device import I2CDevice
 import adafruit_dotstar
@@ -21,6 +22,8 @@ pixels = adafruit_dotstar.DotStar(board.GP18, board.GP19, num_pixels, brightness
 # Set up I2C for IO expander (addr: 0x20)
 i2c = busio.I2C(board.GP5, board.GP4)
 device = I2CDevice(i2c, 0x20)
+
+serial = usb_cdc.serials[1]
 
 # Read button states from the I2C IO expander on the keypad
 def read_button_states(x, y):
@@ -50,32 +53,35 @@ def readButton():
 	for i in range(16):
 		if pressed[i]:
 			if not held[i]:
-				print("d{0}".format(i))
+				logMessage("d{0}".format(i))
 				held[i] = 1
 		else:
 			if held[i]:
-				print("u{0}".format(i))
+				logMessage("u{0}".format(i))
 			held[i] = 0
 
 # Print the message to the serial console
 def logMessage(message):
-	print(message)
+	global serial
+	serial.write((message + "\n").encode())
 
 def non_blocking_read():
+	global serial
 	i = ""
-	while supervisor.runtime.serial_bytes_available:
-		i += sys.stdin.read(1)
+	while serial.in_waiting > 0:
+		i += serial.read(serial.in_waiting).decode()
 	return i
 
 def readline():
 	global readLineBuffer
 	char = non_blocking_read()
-	if len(char) == 0:
+	if len(char) == 0 and len(readLineBuffer) == 0:
 		return
 	readLineBuffer = readLineBuffer + char
-	if readLineBuffer.endswith('\n'):
-		copy = readLineBuffer
-		readLineBuffer = ""
+	newLineIndex = readLineBuffer.find('\n')
+	if newLineIndex != -1:
+		copy = readLineBuffer[:newLineIndex]
+		readLineBuffer = readLineBuffer[(newLineIndex + 1):]
 		return copy
 
 def parseCommand(command):

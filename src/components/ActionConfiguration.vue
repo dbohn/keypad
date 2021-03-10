@@ -50,9 +50,6 @@ export default {
 
     components: {
         Colorpicker,
-        SnippetSelector,
-        GuildSelector,
-        StringInput,
     },
 
     computed: {

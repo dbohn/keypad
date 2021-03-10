@@ -29,6 +29,7 @@ export default new Vuex.Store({
 
         serial: {
             connected: false,
+            currentPort: null,
             ports: [],
             frontend: new SerialFrontend(),
         }
@@ -62,8 +63,9 @@ export default new Vuex.Store({
             Vue.set(state.serial, 'ports', ports);
         },
 
-        connectSerialPort(state, {connected}) {
+        connectSerialPort(state, {connected, port = null}) {
             state.serial.connected = connected;
+            state.serial.currentPort = port;
         }
     },
     actions: {

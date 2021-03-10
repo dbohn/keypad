@@ -3,6 +3,9 @@
         <div class="flex-shrink-0 flex bg-gray-300 h-10 items-center px-2">
             <div>
                 <serial-port-list @connect="connect" v-if="!connected"></serial-port-list>
+                <div class="px-2 font-semibold text-gray-800" v-else>
+                    Verbunden über Port {{ currentPort }}
+                </div>
             </div>
             <button class="text-blue-500 px-3 py-2 text-sm ml-auto flex items-center" @click.prevent="beginLoginProcess" v-if="authState === 'unauthenticated'">
                 <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -53,8 +56,11 @@ export default {
                     return;
                 }
 
+                if (this.actions.colorChanged(this.configuredAction, config)) {
+                    this.serialFrontend.emit('color', config.serialColorCommand(this.configuredAction - 1));
+                }
+
                 this.actions.setConfig(this.configuredAction, config);
-                this.serialFrontend.emit('color', config.serialColorCommand(this.configuredAction - 1));
             }
         },
 
@@ -70,47 +76,23 @@ export default {
             return this.$store.state.serial.frontend;
         },
 
-        port() {
-            return this.serialFrontend.port;
-        },
-
-        remotePort() {
-            return this.serialFrontend.remotePort;
+        currentPort() {
+            return this.$store.state.serial.currentPort;
         }
     },
 
     mounted() {
         this.$store.dispatch('checkAvailableAccessToken').catch(() => {});
 
-        this.serialFrontend.on('open', () => {
-            this.$store.commit('connectSerialPort', {connected: true});
+        this.serialFrontend.on('open', (port) => {
+            this.$store.commit('connectSerialPort', {connected: true, port});
+
+            this.sendColors();
         });
 
         this.serialFrontend.on('close', () => {
             this.$store.commit('connectSerialPort', {connected: false});
         })
-    },
-
-    watch: {
-        port: {
-            immediate: true,
-            handler() {
-                /*this.port.onmessage = (evt) => {
-                    console.log(evt.data);
-                    if (evt.data.event === 'receive' && evt.data.message === "u3") {
-                        this.actions.trigger(4);
-                    }
-
-                    if (evt.data.event === 'open') {
-                        this.$store.commit('connectSerialPort', {connected: true});
-                    }
-
-                    if (evt.data.event === 'close') {
-                        this.$store.commit('connectSerialPort', {connected: false});
-                    }
-                }*/
-            }
-        }
     },
 
     methods: {
@@ -124,6 +106,12 @@ export default {
 
         beginLoginProcess() {
             this.$store.dispatch('login');
+        },
+
+        async sendColors() {
+            for (let color of this.actions.serialColors()) {
+                this.serialFrontend.emit('color', color);
+            }
         },
     },
 
