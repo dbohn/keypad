@@ -72,8 +72,15 @@ export default class SerialCommunication {
         this.channelPort = channelPort;
 
         this.channelPort.on('message', ({data: {event, message}}) => {
-            if (event === 'color') {
-                this.port.write(message);
+            switch (event) {
+                case 'color':
+                    this.port.write(message);
+                    break;
+                case 'reset':
+                    this.port.write("r\n");
+                    break;
+                default:
+                    break;
             }
         });
 

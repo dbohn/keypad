@@ -2,7 +2,7 @@
     <div>
         <label class="font-semibold mb-2 block" :for="fieldName">{{ fieldLabel }}</label>
         <div class="relative">
-            <select :id="fieldName" class="shadow-sm py-2 px-3 rounded appearance-none block w-full" v-model="selectedGuild">
+            <select :id="fieldName" class="shadow-sm py-2 pl-3 pr-7 rounded appearance-none block w-full focus:ring focus:outline-none" v-model="selectedGuild">
                 <option :value="null">Gilde wählen...</option>
                 <option v-for="(guild) in guilds" :key="`guild_${guild.id}`" :value="guild.id">{{ guild.name }}</option>
             </select>
@@ -53,6 +53,17 @@ export default {
 
         fieldName() {
             return this.config.name;
+        }
+    },
+
+    watch: {
+        selectedGuild: {
+            immediate: true,
+            handler() {
+                if (this.selectedGuild === null && this.guilds.length === 1) {
+                    this.selectedGuild = this.guilds[0].id;
+                }
+            }
         }
     },
 

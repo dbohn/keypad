@@ -93,6 +93,9 @@ def parseCommand(command):
 		if button < 0 or button > 15:
 			return
 		pixels[button] = (int(values[1]), int(values[2]), int(values[3]))
+	elif command[0] == 'r':
+		for i in range(16):
+			pixels[i] = (0, 0, 0)
 
 while True:
 	receivedString = readline()

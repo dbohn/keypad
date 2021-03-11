@@ -33,7 +33,6 @@ import ActionConfiguration from './components/ActionConfiguration.vue';
 import Keypad from './components/Keypad.vue';
 import SerialPortList from './components/SerialPortList.vue';
 import UserInfo from './components/UserInfo.vue';
-import ButtonConfiguration from './keypad/ButtonConfiguration';
 
 export default {
     name: 'App',
@@ -59,7 +58,7 @@ export default {
                     return;
                 }
 
-                if (this.actions.colorChanged(this.configuredAction, config)) {
+                if (this.actions.colorChanged(this.configuredAction, config) && this.connected) {
                     this.serialFrontend.emit('color', config.serialColorCommand(this.configuredAction - 1));
                 }
 
@@ -87,17 +86,26 @@ export default {
     mounted() {
         this.$store.dispatch('checkAvailableAccessToken').catch(() => {});
 
-        this.serialFrontend.on('open', (port) => {
+        const connectCallback = (port) => {
             this.$store.commit('connectSerialPort', {connected: true, port});
 
+            this.resetBoard();
+
             this.sendColors();
-        });
+        };
 
-        this.serialFrontend.on('close', () => {
+        const closeCallback = () => {
             this.$store.commit('connectSerialPort', {connected: false});
-        });
+        };
 
-        console.log(ButtonConfiguration.fromStorage(JSON.parse(JSON.stringify(this.actions))));
+        this.serialFrontend.on('open', connectCallback);
+
+        this.serialFrontend.on('close', closeCallback);
+
+        this.$on('hook:destroyed', () => {
+            this.serialFrontend.off('open', connectCallback);
+            this.serialFrontend.off('close', closeCallback);
+        });
     },
 
     methods: {
@@ -118,6 +126,10 @@ export default {
                 this.serialFrontend.emit('color', color);
             }
         },
+
+        resetBoard() {
+            this.serialFrontend.emit('reset', null);
+        }
     },
 
     components: {

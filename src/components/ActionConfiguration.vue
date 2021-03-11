@@ -6,9 +6,13 @@
             <colorpicker v-model="color"></colorpicker>
         </div>
         <div class="my-2 border-b border-gray-400">
+            <label for="button-label" class="font-semibold mb-2 block">Beschriftung</label>
+            <input type="text" class="shadow-sm py-2 px-3 rounded appearance-none block w-full focus:ring focus:outline-none" v-model="label">
+        </div>
+        <div class="my-2 border-b border-gray-400">
             <label class="font-semibold mb-2 block" for="action-selection">Aktion</label>
             <div class="relative mb-2">
-                <select id="action-selection" class="shadow-sm py-2 px-3 rounded appearance-none block w-full" v-model="actionType">
+                <select id="action-selection" class="shadow-sm py-2 pl-3 pr-7 rounded appearance-none block w-full focus:ring focus:outline-none" v-model="actionType">
                     <option v-for="(item, key) in actionCollection" :key="`action_${key}`" :value="key">{{ actionLabel(item) }}</option>
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 pr-2 flex items-center">
@@ -60,6 +64,16 @@ export default {
 
             set(color) {
                 this.updateButton((button) => button.color = color);
+            }
+        },
+
+        label: {
+            get() {
+                return this.value.label;
+            },
+
+            set(label) {
+                this.updateButton((button) => button.label = label);
             }
         },
 

@@ -49,6 +49,14 @@ export default class SerialFrontend {
         this.listeners[event].push(callback);
     }
 
+    off(event, callback) {
+        if (!(event in this.listeners)) {
+            return;
+        }
+
+        this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+    }
+
     emit(event, message) {
         this.port.postMessage({ event, message });
     }

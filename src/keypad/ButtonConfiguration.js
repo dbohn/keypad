@@ -4,10 +4,11 @@ import Color from "./Color";
 import Vue from 'vue';
 
 export class Button {
-    constructor(type, color, params = {}) {
+    constructor(type, color, params = {}, label = null) {
         this.type = type;
         this.color = color;
         this.params = params;
+        this.label = label;
 
         this.pressed = false;
     }
@@ -17,11 +18,11 @@ export class Button {
     }
 
     static fromButton(button) {
-        return new Button(button.type, button.color, button.params);
+        return new Button(button.type, button.color, button.params, button.label);
     }
 
     static fromStore(storedConfig) {
-        return new Button(storedConfig.type, new Color(storedConfig.color), storedConfig.params);
+        return new Button(storedConfig.type, new Color(storedConfig.color), storedConfig.params, storedConfig.label);
     }
 
     setType(type) {
@@ -38,6 +39,7 @@ export class Button {
             type: this.type,
             color: this.color,
             params: this.params,
+            label: this.label,
         };
     }
 }

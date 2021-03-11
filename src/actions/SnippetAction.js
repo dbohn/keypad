@@ -6,15 +6,15 @@ export default class NoAction {
     params() {
         return [
             {
+                name: "guild",
+                label: "Gilde",
+                type: "guild"
+            },
+            {
                 name: "snippet",
                 label: "Snippet",
                 type: "snippet",
             },
-            {
-                name: "guild",
-                label: "Gilde",
-                type: "guild"
-            }
         ];
     }
 

@@ -5,7 +5,7 @@
             <snippet-creator></snippet-creator>
             <div class="flex items-center flex-1">
                 <div class="relative flex-1">
-                    <select :id="fieldName" class="shadow-sm py-2 px-3 rounded appearance-none block w-full" v-model="selectedSnippet">
+                    <select :id="fieldName" class="shadow-sm py-2 pl-3 pr-7 rounded appearance-none block w-full focus:ring focus:outline-none" v-model="selectedSnippet">
                         <option :value="null">Snippet wählen...</option>
                         <option v-for="(snippet) in snippets" :key="`snippet_${snippet.id}`" :value="snippet.id">{{ snippet.name }}</option>
                     </select>
