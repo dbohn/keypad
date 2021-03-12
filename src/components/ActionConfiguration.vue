@@ -7,7 +7,7 @@
         </div>
         <div class="my-2 border-b border-gray-400">
             <label for="button-label" class="font-semibold mb-2 block">Beschriftung</label>
-            <input type="text" class="shadow-sm py-2 px-3 rounded appearance-none block w-full focus:ring focus:outline-none" v-model="label">
+            <input type="text" class="mb-2 shadow-sm py-2 px-3 rounded appearance-none block w-full focus:ring focus:outline-none" v-model="label">
         </div>
         <div class="my-2 border-b border-gray-400">
             <label class="font-semibold mb-2 block" for="action-selection">Aktion</label>
